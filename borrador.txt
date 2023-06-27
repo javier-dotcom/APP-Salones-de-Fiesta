@@ -1,0 +1,713 @@
+
+/*
+Select count(MONTH(payment_date)) as total, MONTH(payment_date) as mes, YEAR(payment_date) as año 
+FROM payment 
+Where YEAR(payment_date) = '2006'
+GROUP BY YEAR(payment_date), MONTH(payment_date) */
+
+
+
+	// $even=array();
+	// $datos="SELECT EXTRACT(DAY FROM fecha_evento ) AS dia
+    // FROM evento WHERE id_salon=1 ";
+	// $consulta=mysqli_query($conexion,$datos);
+	// while($fila=mysqli_fetch_array($consulta)){
+	// array_push($even,$fila["dia"]);
+
+
+    // SELECT fecha FROM registros WHERE (MONTH(fecha) = 1 AND DAY(fecha) = 10) OR (MONTH(fecha) = 2 AND DAY(fecha) = 10);
+
+	/*$datos="SELECT MONTH(EXTRACT(DAY FROM fecha_evento )) AS dia
+    FROM evento WHERE id_salon=1 and MONTH(fecha_evento)= $month ";*/
+
+
+
+	DISPONIBILIDAD BACKUP
+	
+<?php 
+$id=$_GET["id"];
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Disponibilidad</title>
+    <?php
+	require_once "conectar.php";
+
+# definimos los valores iniciales para nuestro calendario
+$id=$_GET["id"];
+if(!isset($_GET["mes"])){
+$dat=1;
+}else{ 
+	$dat=$_GET["mes"];
+
+}
+$month=date($dat);
+$year=date("Y");
+$diaActual=date("j");
+$even=array();
+
+	
+$datos="SELECT DAY(fecha_evento)as dia FROM evento   WHERE (MONTH(fecha_evento)=$month) and id_salon=$id ";
+
+	$consulta=mysqli_query($conexion,$datos);
+	while($fila=mysqli_fetch_array($consulta)){
+	array_push($even,$fila["dia"]);
+
+	}
+
+ 
+# Obtenemos el dia de la semana del primer dia
+# Devuelve 0 para domingo, 6 para sabado
+$diaSemana=date("w",mktime(0,0,0,$month,1,$year))+7;
+# Obtenemos el ultimo dia del mes
+$ultimoDiaMes=date("d",(mktime(0,0,0,$month+1,1,$year)-1));
+ 
+$meses=array(1=>"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+"Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+
+?>
+ 
+
+<style>
+.tabla{
+	text-align: center;
+	border: solid 3px rgb(139, 26, 69);
+	margin: 9px auto;
+	font-weight: bolder;
+	font-size:large;
+
+}
+.m{
+	border: groove 4px rgb(139, 26, 69);
+	padding: 5px;
+}
+.n{
+	background-color:rgb(13, 109, 61); 
+	padding: 5px;
+}
+.b{
+	background-color: rgb(139, 26, 69);
+}
+	body{
+		background-color: black;
+		color: bisque;
+		text-align: center;
+	}
+		#calendar {
+			font-family:Arial;
+			font-size:12px;
+            width: 70%;
+            margin: 0  auto 20px;
+            height: 250px;
+		}
+		#calendar caption {
+			text-align:left;
+			padding:5px 10px;
+			background-color:rgb(139, 26, 69);
+			color:#fff;
+			font-weight:bold;
+		}
+		#calendar th {
+			background-color:rgb(139, 26, 69);
+			color:#fff;
+			width:40px;
+			border: solid 3px rgb(139, 26, 69);
+		}
+		#calendar td {
+			text-align:right;
+			padding:2px 5px;
+			background-color:silver;
+			color: bisque;
+			border: solid 3px rgb(139, 26, 69);
+
+		}
+		#calendar .hoy {
+			background-color:red;
+		}
+		#calendar .free {
+			background-color:rgb(4, 82, 4);
+		}
+		#calendar .nada{
+			background-color:rgb(0, 0, 0);
+		}
+		.x{
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      color: bisque !important;
+      background-color: rgb(139, 26, 69);
+	   }
+	   .h1{
+    border-radius: 16px;
+    padding: 8px;
+    font-size:40px;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    text-align: center;
+    color:rgb(139, 26, 69);
+    margin-top: 12px;
+    box-shadow: 0px -1px 10px 4px rgba(153,146,146,0.75);
+-webkit-box-shadow: 0px -1px 10px 4px rgba(153,146,146,0.75);
+-moz-box-shadow: 0px -1px 10px 4px rgba(153,146,146,0.75);
+}
+.img{
+  margin: 10px;
+    box-shadow: 0px -1px 10px 4px rgba(153,146,146,0.75);
+-webkit-box-shadow: 0px -1px 10px 4px rgba(153,146,146,0.75);
+-moz-box-shadow: 0px -1px 10px 4px rgba(153,146,146,0.75);
+    border-radius: 20px;
+}
+.e{
+    margin: auto;
+    width: 90%;
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 22px;
+    background-color: rgb(51, 54, 53);
+    padding: 5px;
+    box-shadow: 0px -1px 10px 4px rgba(153,146,146,0.75);
+-webkit-box-shadow: 0px -1px 10px 4px rgba(153,146,146,0.75);
+-moz-box-shadow: 0px -1px 10px 4px rgba(153,146,146,0.75);
+}
+.meses{
+	display: flex;
+	justify-content: space-around;
+	width:95%;
+	margin: auto;
+
+}
+.mes{
+	text-decoration: none;
+	background-color: rgb(139, 26, 69);
+	color: bisque;
+	padding: 3px;
+	border: groove 2px rgb(139, 26, 69);
+	border-radius: 5px;
+	width:20%;
+	margin-top: 5px;
+	margin-bottom: 5px;
+
+}
+.mes:hover{
+	text-decoration: none;
+	background-color:rgb(13, 109, 61); 
+	color: bisque;
+	padding: 3px;
+	border: groove 2px rgb(139, 26, 69);
+	border-radius: 5px;
+}
+.rojo{
+	background-color: rgb(248, 15, 15);
+	width: 50px;
+	height: 29px;
+}
+.verde{
+	background-color:rgb(4, 82, 4);
+	width: 50px;
+	height: 29px;
+	margin-bottom: 0;
+}
+.orange{ 
+	background-color:rgb(230, 172, 13);
+	width: 50px;
+	height: 29px;
+}
+
+
+
+.linea{
+	display: flex;
+	justify-content: space-around;
+
+}
+
+	</style>
+</head>
+ 
+<body>
+<br>
+
+<nav class="navbar navbar-dark bg-dark  x ">
+    <div class="container-fluid x position-fixed">
+      <a class="navbar-brand x" href="#">EVENT-PRO</a>
+      <button class="navbar-toggler x" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
+        <span>MENU</span>
+      </button>
+      <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Dark offcanvas</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="opciones.php?id=<?php echo$id;?>">Opciones</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="eventos_cercanos.php?id=<?php echo$id;?>&cant=3">Buscar Eventos cercanos</a>
+          </li>
+		  
+		  <li class="nav-item">
+            <a class="nav-link" href="agendar_evento.php?id=<?php echo$id;?>">Agendar nuevos eventos</a>
+          </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Dropdown
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="#">Action</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="#">Something else here</a></li>
+              </ul>
+            </li>
+          </ul>
+          <form class="d-flex mt-3" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-success" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </nav>
+<br>
+<br>
+
+
+<?php 
+	//echo $id;
+	$datos="SELECT * FROM salon WHERE id_salon = $id";
+	$consulta=mysqli_query($conexion,$datos);
+	$fila=mysqli_fetch_array($consulta);
+	echo "<div class='e'>";
+	echo "<h1 class='h1'> Salon  </h1>";
+	?>
+	<img class="img"src="data:image/jpg;base64,<?php echo base64_encode($fila['logo_salon'])?>" width="90px" height="80px">
+	</div>
+	<br>
+	
+	<br>
+
+<div class="meses">
+<a class="mes"href="disponibilidad.php?mes=1&id=<?php echo$id;?>#calendar">ENE.</a>
+<a class="mes" href="disponibilidad.php?mes=2&id=<?php echo$id;?>#calendar">FEB.</a>
+<a class="mes" href="disponibilidad.php?mes=3&id=<?php echo$id;?>#calendar">MAR.</a>
+<a class="mes" href="disponibilidad.php?mes=4&id=<?php echo$id;?>#calendar">ABR.</a>
+<a class="mes" href="disponibilidad.php?mes=5&id=<?php echo$id;?>#calendar">MAY.</a>
+<a class="mes" href="disponibilidad.php?mes=6&id=<?php echo$id;?>#calendar">JUN.</a>
+</div>
+<div class="meses">
+
+
+<a class="mes" href="disponibilidad.php?mes=7&id=<?php echo$id;?>#calendar">JUL.</a>
+<a class="mes" href="disponibilidad.php?mes=8&id=<?php echo$id;?>#calendar">AGO.</a>
+<a class="mes" href="disponibilidad.php?mes=9&id=<?php echo$id;?>#calendar">SET.</a>
+<a class="mes" href="disponibilidad.php?mes=10&id=<?php echo$id;?>#calendar">OCT.</a>
+<a class="mes" href="disponibilidad.php?mes=11&id=<?php echo$id;?>#calendar">NOV.</a>
+<a class="mes" href="disponibilidad.php?mes=12&id=<?php echo$id;?>#calendar">DIC.</a>
+</div>
+<button class="mes"onclick="back()">Volver</button>
+    <script type="text/javascript">
+      function back(){
+        history.back();
+      }
+    </script> 
+	<br>
+<h2>Referencias</h2>
+
+<div class="linea">
+
+<div class="linea a">
+<div class="rojo">
+</div>&nbsp;
+ <p> : Todo ocupado </p>
+</div>
+
+<div class="linea a">
+<div class="verde">
+</div>&nbsp;
+ <p> : Libre</p>
+</div>
+
+<div class="linea a">
+<div class="orange">
+</div>&nbsp;
+ <p> : Semi ocupado</p>
+</div>
+</div>
+<br>
+
+
+
+
+<h1 >Mostrando disponibilidad</h1>
+
+ <h2>
+<?php echo $meses[$month]." ".$year?>
+</h2> 
+<table id="calendar">
+	<tr>
+		<th>Lun</th><th>Mar</th><th>Mie</th><th>Jue</th>
+		<th>Vie</th><th>Sab</th><th>Dom</th>
+	</tr>
+	
+	<tr bgcolor="silver">
+		<?php
+		$last_cell=$diaSemana+$ultimoDiaMes;
+		// hacemos un bucle hasta 42, que es el máximo de valores que puede
+		// haber... 6 columnas de 7 dias
+		for($i=1;$i<=42;$i++)
+		{
+			if($i==$diaSemana)
+			{
+				// determinamos en que dia empieza
+				$day=1;
+			}
+			if($i<$diaSemana || $i>=$last_cell)
+			{
+				// celca vacia
+				echo "<td class='nada'>&nbsp;</td>";
+			}else{
+				// mostramos el dia
+				if(in_array($day,$even))
+					echo "<td class='hoy'>  $day </td>";
+				else
+					echo "<td class='free'>  $day</td>";
+				$day++;
+			}
+			// cuando llega al final de la semana, iniciamos una columna nueva
+			if($i%7==0)
+			{
+				echo "</tr><tr>\n";
+			}
+		}
+	?>
+	</tr>
+</table>
+<h3>Detalles de eventos</h3>
+<?php 
+$datos1="SELECT * FROM evento where id_salon = $id and (MONTH(fecha_evento)=$month)";
+$consulta1=mysqli_query($conexion,$datos1);
+while($fila=mysqli_fetch_array($consulta1)){
+	$hora_comienzo = strtotime($fila["hora_evento"]);
+	$hora_comienzo= date('H:i:s',$hora_comienzo);
+	$d=$fila["duracion"];
+	$hora_fin = date('H:i:s', strtotime('+'. $d .'hours', strtotime($hora_comienzo))); // Sumar 1 horas a las 17:00:00
+
+?>
+
+<table  class="tabla">
+	<tr class="b">
+	<td class="m">FECHA</td>	<td class="m">COMIENZO</td><td class="m">FINALIZACION</td>
+    </tr>
+	<tr class="n">
+		<td class="m"> <?php echo $fila["fecha_evento"]?></td>
+		<td class="m"> <?php echo $hora_comienzo?></td>
+		<td class="m"> <?php echo $hora_fin?></td>
+	</tr>
+</table>
+
+
+
+
+<?php 
+
+}
+
+?>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ // $datos="SELECT * FROM evento WHERE  id_salon = $id and fecha_evento >= CONVERT(date,GETDATE());";
+
+    $datos1 = "SELECT * FROM evento WHERE id_salon = $id  and fecha_evento >= '$fecha1'";
+
+
+
+
+
+
+	<!-- 
+<?php
+  date_default_timezone_set('America/Argentina/Buenos_Aires');
+  $fecha1 = date('Y-m-d');
+  $dato1 = "SELECT * FROM evento where id_salon=$id and fecha_evento>= '$fecha1' order by fecha_evento asc";
+  $consulta1 = mysqli_query($conexion, $dato1);
+  $cont = 0;
+  while ($fila1 = mysqli_fetch_array($consulta1)) {
+
+
+
+
+    $cont++;
+    $hora_comienzo = strtotime($fila1["hora_evento"]);
+    $hora_comienzo = date('H:i:s', $hora_comienzo);
+
+    $d = $fila1["duracion"];
+    $hora_fin = date('H:i:s', strtotime('+' . $d . 'hours', strtotime($hora_comienzo))); // Sumar 1 horas a las 17:00:00
+  ?>  -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <button class="botonArriba" onclick="irArriba()"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
+</svg></button>
+
+<script>
+  function irArriba() {
+  document.body.scrollTop = 0; // Para navegadores Safari
+  document.documentElement.scrollTop = 0; // Para Chrome, Firefox, IE y Opera
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+alat asalones  
+
+
+
+
+  require_once "conectar.php";
+  if (isset($_POST["altaSalon"])) {
+    $plan=$_GET["plan"];
+    $nombreSalon = $_POST["nombreSalon"];
+    $nombreUsuario = $_POST["nombreUsuario"];
+    $ciudad = $_POST["ciudad"];
+    $mail = $_POST["mail"];
+    $direSalon = $_POST["direSalon"];
+    $telefono = $_POST["telefono"];
+    $imagen = addslashes(file_get_contents($_FILES["imagen"]['tmp_name']));
+
+    $imagenSalon1 = addslashes(file_get_contents($_FILES["imagen_salon1"]['tmp_name']));
+    $imagenSalon2 = addslashes(file_get_contents($_FILES["imagen_salon2"]['tmp_name']));
+    $imagenSalon3= addslashes(file_get_contents($_FILES["imagen_salon3"]['tmp_name']));
+    $imagenSalon4 = addslashes(file_get_contents($_FILES["imagen_salon4"]['tmp_name']));
+    $imagenSalon5= addslashes(file_get_contents($_FILES["imagen_salon5"]['tmp_name']));
+    function generar_contrasena($longitud) {
+      $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_*#&@';
+      $contrasena = '';
+      $max_caracteres = strlen($caracteres) - 1;
+      
+      for ($i = 0; $i < $longitud; $i++) {
+          $caracter_aleatorio = mt_rand(0, $max_caracteres);
+          $contrasena .= $caracteres[$caracter_aleatorio];
+      }
+      
+    return $contrasena;
+  }
+
+
+
+
+
+
+
+  $contrasena = generar_contrasena(10);
+
+
+
+    $dato = "INSERT INTO salon (plan,ciudad,nombre_salon,nombre_usuario, direccion_salon, telefono, logo_salon, mail,imagen_salon1, imagen_salon2, imagen_salon3, imagen_salon4, imagen_salon5) 
+           VALUES ('$plan''$ciudad','$nombreSalon','$nombreUsuario','$direSalon','$telefono','$imagen','$mail','$imagenSalon1','$imagenSalon2','$imagenSalon3','$imagenSalon4','$imagenSalon5') ";
+
+    $dato1 = "INSERT INTO validacion (mail_salon,contraseña) 
+              VALUES ('$mail','$contrasena') ";
+
+    $consulta = mysqli_query($conexion, $dato);
+    $consulta1 = mysqli_query($conexion, $dato1);
+    $dato1 = "SELECT * from salon where id_salon = (SELECT @@identity AS id_salon) ";
+    /*$dato1="SELECT * FROM salon WHERE nombre_usuario = $nombreUsuario ";*/
+
+    $consulta1 = mysqli_query($conexion, $dato1);
+
+    $fila = mysqli_fetch_array($consulta1);
+    $id = $fila["id_salon"];
+    $idd= $id;
+ $_SESSION["id_salon"]=$id;
+
+
+
+$datos3="INSERT INTO datos_editables_salon  (id_salon	,
+precio_promo,
+des1	,
+des2	,
+des3	,
+des4,	
+des5,	
+des6,	
+des7,	
+des8	,
+des9	,
+des10,	
+des11	,
+des12	,
+des13	,
+des14,	
+des15,	
+des16	,
+des17,	
+des18	,
+des19	,
+des20	,
+des21,	
+des22) 
+VALUES($id,'30000',
+'3 hs de pura diversion',
+'30 chicos con coordinadora',
+'15 adultos',
+'Cocina equipad',
+'Vajillas completa',
+'Mantelería',
+'Candy Bar',
+'Ayudante de Cocina',
+'1 Mozo',
+'1 Coordinador para 15 niños',
+'Salón Climatizado',
+'Pista de Baile con luces',
+'Just Dance','Metegol y tejo',
+'Pelotero y Kinder',
+'Piñata sin relleno',
+'Maquillaje Artístico',
+'Invitaciones Virtuales Interactivas con temática elegida',
+'Menú infantil: Panchos para los más chicos.',
+'Diversion asegurada',
+'Ambiente Protegido',
+'Dedicación full')";
+$consulta=mysqli_query($conexion,$datos3);
+
+
+
+
+    echo " <h2>Perfecto " . $fila["nombre_usuario"] . "</h2>";
+    echo " <h3> Vamos a corroborar <br>los datos de tu salon</h3>";
+  ?>
+
+
+    <div class="a">
+      <div class="b">
+        <p class="letra_ancha"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-house-check-fill" viewBox="0 0 16 16">
+            <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5Z" />
+            <path d="m8 3.293 4.712 4.712A4.5 4.5 0 0 0 8.758 15H3.5A1.5 1.5 0 0 1 2 13.5V9.293l6-6Z" />
+            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.707l.547.547 1.17-1.951a.5.5 0 1 1 .858.514Z" />
+          </svg> Tu Salon</p>
+
+        <p> <?php echo $fila["nombre_salon"]  ?></p>
+      </div>
+
+      <div class="b">
+        <p class="letra_ancha"> <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+          </svg> Direccion del salon</p>
+        <p> <?php echo $fila["direccion_salon"]  ?></p>
+      </div>
+
+    </div>
+    </div>
+
+    <div class="a">
+
+      <div class="b">
+        <p> <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-telephone-fill" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z" />
+          </svg> &nbsp;Telefono </p>
+        <p> <?php echo $fila["telefono"] ?> </p>
+      </div>
+
+      <div class="b">
+        <p class="letra_ancha"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-geo-fill" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999zm2.493 8.574a.5.5 0 0 1-.411.575c-.712.118-1.28.295-1.655.493a1.319 1.319 0 0 0-.37.265.301.301 0 0 0-.057.09V14l.002.008a.147.147 0 0 0 .016.033.617.617 0 0 0 .145.15c.165.13.435.27.813.395.751.25 1.82.414 3.024.414s2.273-.163 3.024-.414c.378-.126.648-.265.813-.395a.619.619 0 0 0 .146-.15.148.148 0 0 0 .015-.033L12 14v-.004a.301.301 0 0 0-.057-.09 1.318 1.318 0 0 0-.37-.264c-.376-.198-.943-.375-1.655-.493a.5.5 0 1 1 .164-.986c.77.127 1.452.328 1.957.594C12.5 13 13 13.4 13 14c0 .426-.26.752-.544.977-.29.228-.68.413-1.116.558-.878.293-2.059.465-3.34.465-1.281 0-2.462-.172-3.34-.465-.436-.145-.826-.33-1.116-.558C3.26 14.752 3 14.426 3 14c0-.599.5-1 .961-1.243.505-.266 1.187-.467 1.957-.594a.5.5 0 0 1 .575.411z" />
+          </svg> &nbsp;Ciudad </p>
+        <p> <?php echo $fila["ciudad"] ?> </p>
+      </div>
+    </div>
+
+    <div class="a">
+
+      <div class="b">
+        <p class="letra_ancha"> <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+          </svg> El logo de tu salon</p>
+        <p> <img src="data:image/jpg;base64,<?php echo base64_encode($fila['logo_salon']) ?>" width="170px" height="170px"></p>
+      </div>
+    </div>
+
+
+    <div class="a">
+      <div class="b bb">
+        <p class="letra_ancha"> <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-envelope-at-fill" viewBox="0 0 16 16">
+            <path d="M2 2A2 2 0 0 0 .05 3.555L8 8.414l7.95-4.859A2 2 0 0 0 14 2H2Zm-2 9.8V4.698l5.803 3.546L0 11.801Zm6.761-2.97-6.57 4.026A2 2 0 0 0 2 14h6.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.606-3.446l-.367-.225L8 9.586l-1.239-.757ZM16 9.671V4.697l-5.803 3.546.338.208A4.482 4.482 0 0 1 12.5 8c1.414 0 2.675.652 3.5 1.671Z" />
+            <path d="M15.834 12.244c0 1.168-.577 2.025-1.587 2.025-.503 0-1.002-.228-1.12-.648h-.043c-.118.416-.543.643-1.015.643-.77 0-1.259-.542-1.259-1.434v-.529c0-.844.481-1.4 1.26-1.4.585 0 .87.333.953.63h.03v-.568h.905v2.19c0 .272.18.42.411.42.315 0 .639-.415.639-1.39v-.118c0-1.277-.95-2.326-2.484-2.326h-.04c-1.582 0-2.64 1.067-2.64 2.724v.157c0 1.867 1.237 2.654 2.57 2.654h.045c.507 0 .935-.07 1.18-.18v.731c-.219.1-.643.175-1.237.175h-.044C10.438 16 9 14.82 9 12.646v-.214C9 10.36 10.421 9 12.485 9h.035c2.12 0 3.314 1.43 3.314 3.034v.21Zm-4.04.21v.227c0 .586.227.8.581.8.31 0 .564-.17.564-.743v-.367c0-.516-.275-.708-.572-.708-.346 0-.573.245-.573.791Z" />
+          </svg> Mail de contacto</p>
+        <p class="text"> <?php echo $fila["mail"] ?> </p>
+      </div>
+
+    </div>
+
+
+
+    <div class="a">
+      <a class="c" href="opciones.php">CONFIRMAR DATOS</a>
+
+      <a class="c" href="">MODIFICAR DATOS</a>
+    </div>
+
+
+  <?php
+
+echo $id;
+  }
